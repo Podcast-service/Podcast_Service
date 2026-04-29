@@ -8,10 +8,11 @@ jobs:
   deploy:
     runs-on: self-hosted
     steps:
-      - name: Copy .env
-        run: cp /home/deploy/.env .env
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Copy .env
+        run: cp /home/deploy/.env .env
 
       - name: Login to Docker Hub
         run: |
@@ -22,15 +23,16 @@ jobs:
         run: |
           SERVICE=${{ github.event.client_payload.service }}
           IMAGE_TAG=${{ github.event.client_payload.image_tag }}
-          
-          # Преобразуем имя сервиса в переменную окружения
-          # podcast_core -> PODCAST_CORE_TAG
+    
           TAG_VAR=$(echo "${SERVICE^^}_TAG")
-          
+    
           echo "Setting $TAG_VAR=$IMAGE_TAG"
-          
-          # Обновляем нужную строку в .env файле
+    
+          # Обновляем в рабочей папке
           sed -i "s/^${TAG_VAR}=.*/${TAG_VAR}=${IMAGE_TAG}/" .env
+    
+          # Обновляем оригинальный файл на сервере
+          sed -i "s/^${TAG_VAR}=.*/${TAG_VAR}=${IMAGE_TAG}/" /home/deploy/.env
 
       - name: Deploy selected service
         run: |
