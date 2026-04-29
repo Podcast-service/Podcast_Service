@@ -1,0 +1,45 @@
+name: Deploy service
+
+on:
+  repository_dispatch:
+    types: [deploy]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Copy .env
+        run: cp /home/deploy/.env .env
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | \
+          docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Update image tag in .env
+        run: |
+          SERVICE=${{ github.event.client_payload.service }}
+          IMAGE_TAG=${{ github.event.client_payload.image_tag }}
+          
+          # Преобразуем имя сервиса в переменную окружения
+          # podcast_core -> PODCAST_CORE_TAG
+          TAG_VAR=$(echo "${SERVICE^^}_TAG")
+          
+          echo "Setting $TAG_VAR=$IMAGE_TAG"
+          
+          # Обновляем нужную строку в .env файле
+          sed -i "s/^${TAG_VAR}=.*/${TAG_VAR}=${IMAGE_TAG}/" .env
+
+      - name: Deploy selected service
+        run: |
+          SERVICE=${{ github.event.client_payload.service }}
+          IMAGE_TAG=${{ github.event.client_payload.image_tag }}
+          
+          echo "Deploying $SERVICE:$IMAGE_TAG"
+          
+          docker compose pull $SERVICE
+          docker compose up -d --no-deps $SERVICE
+          
+          echo "Successfully deployed $SERVICE:$IMAGE_TAG"
