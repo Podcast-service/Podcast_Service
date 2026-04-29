@@ -13,6 +13,12 @@ jobs:
 
       - name: Copy .env
         run: cp /home/deploy/.env ${{ github.workspace }}/.env
+        
+      - name: Debug workspace
+        run: |
+          echo "Workspace: ${{ github.workspace }}"
+          ls -la ${{ github.workspace }}
+          pwd
 
       - name: Login to Docker Hub
         run: |
