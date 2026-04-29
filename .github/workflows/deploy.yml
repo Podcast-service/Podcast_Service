@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Copy .env
-        run: cp /home/deploy/.env .env
+        run: cp /home/deploy/.env ${{ github.workspace }}/.env
 
       - name: Login to Docker Hub
         run: |
@@ -28,20 +28,17 @@ jobs:
     
           echo "Setting $TAG_VAR=$IMAGE_TAG"
     
-          # Обновляем в рабочей папке
-          sed -i "s/^${TAG_VAR}=.*/${TAG_VAR}=${IMAGE_TAG}/" .env
-    
-          # Обновляем оригинальный файл на сервере
+          sed -i "s/^${TAG_VAR}=.*/${TAG_VAR}=${IMAGE_TAG}/" ${{ github.workspace }}/.env
           sed -i "s/^${TAG_VAR}=.*/${TAG_VAR}=${IMAGE_TAG}/" /home/deploy/.env
 
       - name: Deploy selected service
         run: |
           SERVICE=${{ github.event.client_payload.service }}
           IMAGE_TAG=${{ github.event.client_payload.image_tag }}
-          
+    
           echo "Deploying $SERVICE:$IMAGE_TAG"
-          
+    
           docker compose pull $SERVICE
           docker compose up -d --no-deps $SERVICE
-          
+    
           echo "Successfully deployed $SERVICE:$IMAGE_TAG"
