@@ -1,0 +1,30 @@
+name: Setup server
+
+on:
+  workflow_dispatch:  # запускается вручную из GitHub UI
+
+jobs:
+  setup:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Copy .env if exists
+        run: |
+          if [ -f /home/deploy/.env ]; then
+            cp /home/deploy/.env .env
+            echo ".env copied"
+          else
+            echo "ERROR: /home/deploy/.env not found, create it first"
+            exit 1
+          fi
+
+      - name: Start infrastructure
+        run: docker compose -f docker-compose.infra.yml up -d
+
+      - name: Wait for infrastructure
+        run: sleep 15
+
+      - name: Check infrastructure
+        run: docker compose -f docker-compose.infra.yml ps
