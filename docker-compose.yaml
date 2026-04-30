@@ -4,13 +4,8 @@ services:
     image: malblsh/auth_service:${AUTH_SERVICE_TAG:-latest}
     container_name: auth_service
     env_file: .env
-    depends_on:
-      auth-db:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
+    ports:
+      - "8080:8080"
     restart: unless-stopped
     networks:
       - podcast-network
