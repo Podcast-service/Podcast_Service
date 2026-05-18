@@ -1,12 +1,21 @@
 services:
-
   auth_service:
     image: malblsh/auth_service:${AUTH_SERVICE_TAG:-latest}
-    container_name: auth_service
-    env_file: .env
+
+    env_file:
+      - /home/deploy/.env
+
     ports:
       - "8080:8080"
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
     restart: unless-stopped
+
     networks:
       - podcast-network
 
