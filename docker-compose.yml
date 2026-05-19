@@ -20,11 +20,6 @@ services:
       - "8081:8081"
     volumes:
       - media-tmp:/tmp/media_uploads
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     restart: unless-stopped
     networks:
       - podcast-network
