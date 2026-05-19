@@ -18,8 +18,49 @@ services:
 
     networks:
       - podcast-network
+  media_upload_service:
+    image: malblsh/media_upload_service:${MEDIA_UPLOAD_SERVICE_TAG:-latest}
+    env_file:
+      - /home/deploy/.env
+    ports:
+      - "8081:8081"
+    volumes:
+      - media-tmp:/tmp/media_uploads
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - podcast-network
+
+  media_worker:
+    image: malblsh/media_worker:${MEDIA_WORKER_TAG:-latest}
+    env_file:
+      - /home/deploy/.env
+    ports:
+      - "8082:8082"
+    volumes:
+      - media-tmp:/tmp/media_uploads
+    restart: unless-stopped
+    networks:
+      - podcast-network
+
+  speech_service:
+    image: malblsh/speech_service:${SPEECH_SERVICE_TAG:-latest}
+    env_file:
+      - /home/deploy/.env
+    volumes:
+      - ${WHISPER_MODELS_PATH}:/models:ro
+    restart: unless-stopped
+    networks:
+      - podcast-network    
 
 networks:
   podcast-network:
     external: true
     name: podcast-network
+    
+volumes:
+  media-tmp:

@@ -42,69 +42,61 @@ services:
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
-
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
-
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
-
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_DEFAULT_REPLICATION_FACTOR: 1
       KAFKA_MIN_INSYNC_REPLICAS: 1
-
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
-
       CLUSTER_ID: ${KAFKA_CLUSTER_ID}
-
     ports:
       - "9092:9092"
-
     volumes:
       - kafka-data:/var/lib/kafka/data
-
     healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 9092"]
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092 >/dev/null 2>&1"]
       interval: 10s
       timeout: 5s
       retries: 10
-
     restart: unless-stopped
-
     networks:
       - podcast-network
 
   kafka-init:
     image: confluentinc/cp-kafka:7.6.0
-
     depends_on:
       kafka:
         condition: service_healthy
-
     command: >
       bash -c '
-      until kafka-topics
-      --bootstrap-server kafka:9092
-      --list; do
-        echo "Waiting for Kafka...";
-        sleep 5;
-      done;
-
-      kafka-topics
-      --bootstrap-server kafka:9092
-      --create
-      --if-not-exists
-      --topic podcast.user.register
-      --partitions 1
-      --replication-factor 1
+      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic podcast.user.register --partitions 1 --replication-factor 1;
+      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic media --partitions 1 --replication-factor 1;
+      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic media.worker --partitions 1 --replication-factor 1;
+      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic media.subtitle --partitions 1 --replication-factor 1;
+      kafka-topics --bootstrap-server kafka:9092 --list
       '
-
     restart: "no"
+    networks:
+      - podcast-network
 
+  rustfs:
+    image: rustfs/rustfs:latest
+    command:
+      - /data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      RUSTFS_ADDRESS: ":9000"
+      RUSTFS_CONSOLE_ENABLE: "true"
+      RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY_ID}
+      RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_ACCESS_KEY}
+    volumes:
+      - rustfs-data:/data
+    restart: unless-stopped
     networks:
       - podcast-network
 
@@ -112,6 +104,7 @@ volumes:
   auth-db-data:
   rabbitmq-data:
   kafka-data:
+  rustfs-data:
 
 networks:
   podcast-network:
