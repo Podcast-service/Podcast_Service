@@ -8,12 +8,6 @@ services:
     ports:
       - "8080:8080"
 
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
     restart: unless-stopped
 
     networks:
@@ -61,6 +55,6 @@ networks:
   podcast-network:
     external: true
     name: podcast-network
-    
+
 volumes:
   media-tmp:
