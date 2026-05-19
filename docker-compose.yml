@@ -1,6 +1,7 @@
 services:
   auth_service:
     image: malblsh/auth_service:${AUTH_SERVICE_TAG:-latest}
+    container_name: auth_service
 
     env_file:
       - /home/deploy/.env
@@ -14,6 +15,7 @@ services:
       - podcast-network
   media_upload_service:
     image: malblsh/media_upload_service:${MEDIA_UPLOAD_SERVICE_TAG:-latest}
+    container_name: media_upload_service
     env_file:
       - /home/deploy/.env
     expose:
@@ -26,6 +28,7 @@ services:
 
   media_worker:
     image: malblsh/media_worker:${MEDIA_WORKER_TAG:-latest}
+    container_name: media_worker
     env_file:
       - /home/deploy/.env
     expose:
@@ -38,6 +41,7 @@ services:
 
   speech_service:
     image: malblsh/speech_service:${SPEECH_SERVICE_TAG:-latest}
+    container_name: speech_service
     env_file:
       - /home/deploy/.env
     volumes:
