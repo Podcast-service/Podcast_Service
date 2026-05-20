@@ -29,3 +29,5 @@ jobs:
           docker compose \
             -f docker-compose.infra.yml \
             ps
+      - name: Restart nginx
+        run: docker restart podcast_service-nginx-1
