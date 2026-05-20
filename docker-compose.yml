@@ -48,7 +48,13 @@ services:
       - ${WHISPER_MODELS_PATH}:/models:ro
     restart: unless-stopped
     networks:
-      - podcast-network    
+      - podcast-network  
+  podcast_client:
+    image: malblsh/podcast_client:${PODCAST_CLIENT_TAG:-latest}
+    container_name: podcast_client
+    restart: unless-stopped
+    networks:
+      - podcast-network        
 
 networks:
   podcast-network:
