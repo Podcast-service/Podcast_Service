@@ -12,10 +12,10 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Login to Docker Hub
+      - name: Login to GHCR
         run: |
-          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | \
-          docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          echo "${{ secrets.GHCR_PAT }}" | \
+          docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
 
       - name: Update image tag in .env
         run: |

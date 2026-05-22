@@ -1,6 +1,6 @@
 services:
   auth_service:
-    image: malblsh/auth_service:${AUTH_SERVICE_TAG:-latest}
+    image: ghcr.io/podcast-service/auth_service:${AUTH_SERVICE_TAG:-latest}
     container_name: auth_service
 
     env_file:
@@ -14,7 +14,7 @@ services:
     networks:
       - podcast-network
   media_upload_service:
-    image: malblsh/media_upload_service:${MEDIA_UPLOAD_SERVICE_TAG:-latest}
+    image: ghcr.io/podcast-service/media_upload_service:${MEDIA_UPLOAD_SERVICE_TAG:-latest}
     container_name: media_upload_service
     env_file:
       - /home/deploy/.env
@@ -27,7 +27,7 @@ services:
       - podcast-network
 
   media_worker:
-    image: malblsh/media_worker:${MEDIA_WORKER_TAG:-latest}
+    image: ghcr.io/podcast-service/media_worker:${MEDIA_WORKER_TAG:-latest}
     container_name: media_worker
     env_file:
       - /home/deploy/.env
@@ -40,7 +40,7 @@ services:
       - podcast-network
 
   speech_service:
-    image: malblsh/speech_service:${SPEECH_SERVICE_TAG:-latest}
+    image: ghcr.io/podcast-service/speech_service:${SPEECH_SERVICE_TAG:-latest}
     container_name: speech_service
     env_file:
       - /home/deploy/.env
@@ -50,14 +50,14 @@ services:
     networks:
       - podcast-network  
   podcast_client:
-    image: malblsh/podcast_client:${PODCAST_CLIENT_TAG:-latest}
+    image: ghcr.io/podcast-service/podcast_client:${PODCAST_CLIENT_TAG:-latest}
     container_name: podcast_client
     restart: unless-stopped
     networks:
       - podcast-network
    
   email_service:
-    image: malblsh/email_service:${EMAIL_SERVICE_TAG:-latest}
+    image: ghcr.io/podcast-service/email_service:${EMAIL_SERVICE_TAG:-latest}
     container_name: email_service
     env_file:
       - /home/deploy/.env
