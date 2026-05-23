@@ -27,7 +27,8 @@ jobs:
       - name: Show infrastructure status
         run: |
           docker compose \
-            -f docker-compose.infra.yml \
-            ps
+          --env-file /home/deploy/.env \
+          -f docker-compose.infra.yml \
+          ps
       - name: Restart nginx
         run: docker restart nginx
