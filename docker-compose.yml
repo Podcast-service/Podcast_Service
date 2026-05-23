@@ -39,6 +39,16 @@ services:
     networks:
       - podcast-network
 
+  podcast_core:
+    image: ghcr.io/podcast-service/podcast_core:${PODCAST_CORE_TAG:-latest}
+    container_name: podcast_core
+    env_file:
+      - /home/deploy/.env
+    expose:
+      - "8083"
+    restart: unless-stopped
+    networks:
+      - podcast-network
   speech_service:
     image: ghcr.io/podcast-service/speech_service:${SPEECH_SERVICE_TAG:-latest}
     container_name: speech_service
