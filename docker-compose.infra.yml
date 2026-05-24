@@ -9,7 +9,7 @@ services:
     expose:
       - "5432"
     volumes:
-      - auth-db-data:/var/lib/postgresql/data
+      - auth-db-data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${AUTH_DB_USER} -d ${AUTH_DB_NAME}"]
       interval: 10s
@@ -29,7 +29,7 @@ services:
     expose:
       - "5432"
     volumes:
-      - podcast-db-data:/var/lib/postgresql/data
+      - podcast-db-data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${PODCAST_DB_USER} -d ${PODCAST_DB}"]
       interval: 10s
