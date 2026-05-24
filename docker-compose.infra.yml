@@ -1,6 +1,6 @@
 services:
   auth-db:
-    image: postgres:16.4
+    image: postgres:18-alpine 
     container_name: auth-db
     environment:
       POSTGRES_USER: ${AUTH_DB_USER}
@@ -20,7 +20,7 @@ services:
       - podcast-network
 
   podcast-db:
-    image: postgres:16.4
+    image: postgres:18-alpine
     container_name: podcast-db
     environment:
       POSTGRES_USER: ${PODCAST_DB_USER}
