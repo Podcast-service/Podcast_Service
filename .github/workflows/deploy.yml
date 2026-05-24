@@ -49,6 +49,6 @@ jobs:
             -f docker-compose.yml \
             up -d --no-deps $SERVICE
 
-          docker image prune -f
+          docker image prune -a -f
 
           echo "Successfully deployed $SERVICE:$IMAGE_TAG"
