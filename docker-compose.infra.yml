@@ -109,26 +109,6 @@ services:
     networks:
       - podcast-network
 
-  rustfs:
-    image: rustfs/rustfs:latest
-    container_name: rustfs
-    command:
-      - /data
-    ports:
-      - "9001:9001"
-    expose:
-      - "9000"
-    environment:
-      RUSTFS_ADDRESS: ":9000"
-      RUSTFS_CONSOLE_ENABLE: "true"
-      RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY_ID}
-      RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_ACCESS_KEY}
-    volumes:
-      - rustfs-data:/data
-    restart: unless-stopped
-    networks:
-      - podcast-network
-
   nginx:
     image: nginx:alpine
     container_name: nginx
@@ -145,7 +125,6 @@ volumes:
   podcast-db-data:
   rabbitmq-data:
   kafka-data:
-  rustfs-data:
 
 networks:
   podcast-network:
