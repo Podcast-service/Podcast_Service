@@ -86,7 +86,26 @@ services:
       - /home/deploy/.env
     restart: unless-stopped
     networks:
-      - podcast-network       
+      - podcast-network
+
+  distribution_service:
+    image: ghcr.io/podcast-service/distribution_service:${DISTRIBUTION_SERVICE_TAG:-latest}
+    container_name: distribution_service
+    env_file:
+      - /home/deploy/.env
+    environment:
+      DATABASE_URL: postgres://${PODCAST_DB_USER}:${PODCAST_DB_PASSWORD}@podcast-db:5432/${PODCAST_DB}
+      BIND_ADDR: 0.0.0.0:8788
+      PUBLIC_BASE_URL: ${DISTRIBUTION_PUBLIC_BASE_URL:-http://186.246.30.30}
+      AUTH_SERVICE_URL: http://auth_service:8080/auth
+      AUTH_INTERNAL_API_TOKEN: ${AUTH_INTERNAL_API_TOKEN:-}
+      AUTH_CACHE_TTL_SECONDS: ${AUTH_CACHE_TTL_SECONDS:-3600}
+      RUST_LOG: ${DISTRIBUTION_RUST_LOG:-distribution_service=info,tower_http=warn,sqlx=warn}
+    expose:
+      - "8788"
+    restart: unless-stopped
+    networks:
+      - podcast-network
 
 networks:
   podcast-network:
