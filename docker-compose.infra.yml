@@ -39,6 +39,22 @@ services:
     networks:
       - podcast-network
 
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    expose:
+      - "6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+    networks:
+      - podcast-network
+
   rabbitmq:
     image: rabbitmq:3.13-management
     container_name: rabbitmq
@@ -125,6 +141,7 @@ volumes:
   podcast-db-data:
   rabbitmq-data:
   kafka-data:
+  redis-data: 
 
 networks:
   podcast-network:

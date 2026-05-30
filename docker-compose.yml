@@ -38,6 +38,19 @@ services:
     restart: unless-stopped
     networks:
       - podcast-network
+    
+  tts_service:
+    image: ghcr.io/podcast-service/tts_service:${TTS_SERVICE_TAG:-latest}
+    container_name: tts_service
+    env_file:
+      - /home/deploy/.env
+    expose:
+      - "8000"
+    volumes:
+      - tts-audio:/app/audio
+    restart: unless-stopped
+    networks:
+      - podcast-network
 
   podcast_core:
     image: ghcr.io/podcast-service/podcast_core:${PODCAST_CORE_TAG:-latest}
@@ -82,3 +95,4 @@ networks:
 
 volumes:
   media-tmp:
+  tts-audio:  
