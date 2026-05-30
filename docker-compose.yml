@@ -90,6 +90,9 @@ services:
 
   distribution_service:
     image: ghcr.io/podcast-service/distribution_service:${DISTRIBUTION_SERVICE_TAG:-latest}
+    build:
+      context: ${DISTRIBUTION_BUILD_CONTEXT:-../distribution_service}
+      dockerfile: Dockerfile
     container_name: distribution_service
     env_file:
       - /home/deploy/.env
