@@ -90,22 +90,25 @@ services:
 
   distribution_service:
     image: ghcr.io/podcast-service/distribution_service:${DISTRIBUTION_SERVICE_TAG:-latest}
-    build:
-      context: ${DISTRIBUTION_BUILD_CONTEXT:-../distribution_service}
-      dockerfile: Dockerfile
     container_name: distribution_service
     env_file:
       - /home/deploy/.env
     environment:
-      DATABASE_URL: postgres://${PODCAST_DB_USER}:${PODCAST_DB_PASSWORD}@podcast-db:5432/${PODCAST_DB}
+      DATABASE_URL: ${DISTRIBUTION_DATABASE_URL}
+      PUBLIC_BASE_URL: ${DISTRIBUTION_PUBLIC_BASE_URL}
+      AUTH_SERVICE_URL: ${DISTRIBUTION_AUTH_SERVICE_URL}
+      AUTH_INTERNAL_API_TOKEN: ${AUTH_INTERNAL_API_TOKEN}
+      RUST_LOG: ${DISTRIBUTION_RUST_LOG}
+      DB_MAX_CONNECTIONS: ${DISTRIBUTION_DB_MAX_CONNECTIONS}
       BIND_ADDR: 0.0.0.0:8788
-      PUBLIC_BASE_URL: ${DISTRIBUTION_PUBLIC_BASE_URL:-http://186.246.30.30}
-      AUTH_SERVICE_URL: http://auth_service:8080/auth
-      AUTH_INTERNAL_API_TOKEN: ${AUTH_INTERNAL_API_TOKEN:-}
-      AUTH_CACHE_TTL_SECONDS: ${AUTH_CACHE_TTL_SECONDS:-3600}
-      RUST_LOG: ${DISTRIBUTION_RUST_LOG:-distribution_service=info,tower_http=warn,sqlx=warn}
     expose:
       - "8788"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8788/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
     networks:
       - podcast-network
