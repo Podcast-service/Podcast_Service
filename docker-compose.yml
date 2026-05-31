@@ -2,24 +2,36 @@ services:
   auth_service:
     image: ghcr.io/podcast-service/auth_service:${AUTH_SERVICE_TAG:-latest}
     container_name: auth_service
-
     env_file:
       - /home/deploy/.env
-
+    environment:
+      OTEL_SERVICE_NAME: auth_service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_RESOURCE_ATTRIBUTES: service.namespace=podcast,deployment.environment=${DEPLOYMENT_ENV}
     expose:
       - "8080"
-
     restart: unless-stopped
-
     networks:
       - podcast-network
       - otel-network
-      
+
   media_upload_service:
     image: ghcr.io/podcast-service/media_upload_service:${MEDIA_UPLOAD_SERVICE_TAG:-latest}
     container_name: media_upload_service
     env_file:
       - /home/deploy/.env
+    environment:
+      OTEL_SERVICE_NAME: media_upload_service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_RESOURCE_ATTRIBUTES: service.namespace=podcast,deployment.environment=${DEPLOYMENT_ENV}
     expose:
       - "8081"
     volumes:
@@ -34,6 +46,14 @@ services:
     container_name: media_worker
     env_file:
       - /home/deploy/.env
+    environment:
+      OTEL_SERVICE_NAME: media_worker
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_RESOURCE_ATTRIBUTES: service.namespace=podcast,deployment.environment=${DEPLOYMENT_ENV}
     expose:
       - "8082"
     volumes:
@@ -42,12 +62,20 @@ services:
     networks:
       - podcast-network
       - otel-network
-    
+
   tts_service:
     image: ghcr.io/podcast-service/tts_service:${TTS_SERVICE_TAG:-latest}
     container_name: tts_service
     env_file:
       - /home/deploy/.env
+    environment:
+      OTEL_SERVICE_NAME: tts_service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_RESOURCE_ATTRIBUTES: service.namespace=tts,deployment.environment=${DEPLOYMENT_ENV}
     expose:
       - "8000"
     volumes:
@@ -62,40 +90,66 @@ services:
     container_name: podcast_core
     env_file:
       - /home/deploy/.env
+    environment:
+      OTEL_SERVICE_NAME: podcast_core
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_RESOURCE_ATTRIBUTES: service.namespace=podcast,deployment.environment=${DEPLOYMENT_ENV}
     expose:
       - "8083"
     restart: unless-stopped
     networks:
       - podcast-network
+      - otel-network
+
   speech_service:
     image: ghcr.io/podcast-service/speech_service:${SPEECH_SERVICE_TAG:-latest}
     container_name: speech_service
     env_file:
       - /home/deploy/.env
+    environment:
+      OTEL_SERVICE_NAME: speech_service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_RESOURCE_ATTRIBUTES: service.namespace=podcast,deployment.environment=${DEPLOYMENT_ENV}
     volumes:
       - ${WHISPER_MODELS_PATH}:/models:ro
     restart: unless-stopped
     networks:
       - podcast-network
-      - otel-network  
+      - otel-network
+
   podcast_client:
     image: ghcr.io/podcast-service/podcast_client:${PODCAST_CLIENT_TAG:-latest}
     container_name: podcast_client
     restart: unless-stopped
     networks:
       - podcast-network
-      - otel-network
-   
+
   email_service:
     image: ghcr.io/podcast-service/email_service:${EMAIL_SERVICE_TAG:-latest}
     container_name: email_service
     env_file:
       - /home/deploy/.env
+    environment:
+      OTEL_SERVICE_NAME: email_service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_RESOURCE_ATTRIBUTES: service.namespace=podcast,deployment.environment=${DEPLOYMENT_ENV}
     restart: unless-stopped
     networks:
       - podcast-network
       - otel-network
-    
+
   tts_service_worker:
     image: ghcr.io/podcast-service/tts_service:${TTS_SERVICE_TAG:-latest}
     container_name: tts_worker
@@ -134,7 +188,6 @@ services:
     networks:
       - podcast-network
       - otel-network
-      
 
   distribution_service:
     image: ghcr.io/podcast-service/distribution_service:${DISTRIBUTION_SERVICE_TAG:-latest}
@@ -149,6 +202,13 @@ services:
       RUST_LOG: ${DISTRIBUTION_RUST_LOG}
       DB_MAX_CONNECTIONS: ${DISTRIBUTION_DB_MAX_CONNECTIONS}
       BIND_ADDR: 0.0.0.0:8788
+      OTEL_SERVICE_NAME: distribution_service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_RESOURCE_ATTRIBUTES: service.namespace=podcast,deployment.environment=${DEPLOYMENT_ENV}
     expose:
       - "8788"
     healthcheck:
@@ -172,4 +232,4 @@ networks:
 
 volumes:
   media-tmp:
-  tts-audio:  
+  tts-audio:
