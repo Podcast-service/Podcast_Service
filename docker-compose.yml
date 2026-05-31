@@ -13,6 +13,8 @@ services:
 
     networks:
       - podcast-network
+      - otel-network
+      
   media_upload_service:
     image: ghcr.io/podcast-service/media_upload_service:${MEDIA_UPLOAD_SERVICE_TAG:-latest}
     container_name: media_upload_service
@@ -25,6 +27,7 @@ services:
     restart: unless-stopped
     networks:
       - podcast-network
+      - otel-network
 
   media_worker:
     image: ghcr.io/podcast-service/media_worker:${MEDIA_WORKER_TAG:-latest}
@@ -38,6 +41,7 @@ services:
     restart: unless-stopped
     networks:
       - podcast-network
+      - otel-network
     
   tts_service:
     image: ghcr.io/podcast-service/tts_service:${TTS_SERVICE_TAG:-latest}
@@ -51,6 +55,7 @@ services:
     restart: unless-stopped
     networks:
       - podcast-network
+      - otel-network
 
   podcast_core:
     image: ghcr.io/podcast-service/podcast_core:${PODCAST_CORE_TAG:-latest}
@@ -71,13 +76,15 @@ services:
       - ${WHISPER_MODELS_PATH}:/models:ro
     restart: unless-stopped
     networks:
-      - podcast-network  
+      - podcast-network
+      - otel-network  
   podcast_client:
     image: ghcr.io/podcast-service/podcast_client:${PODCAST_CLIENT_TAG:-latest}
     container_name: podcast_client
     restart: unless-stopped
     networks:
       - podcast-network
+      - otel-network
    
   email_service:
     image: ghcr.io/podcast-service/email_service:${EMAIL_SERVICE_TAG:-latest}
@@ -87,6 +94,7 @@ services:
     restart: unless-stopped
     networks:
       - podcast-network
+      - otel-network
     
   tts_service_worker:
     image: ghcr.io/podcast-service/tts_service:${TTS_SERVICE_TAG:-latest}
@@ -125,6 +133,7 @@ services:
     restart: unless-stopped
     networks:
       - podcast-network
+      - otel-network
       
 
   distribution_service:
@@ -151,11 +160,15 @@ services:
     restart: unless-stopped
     networks:
       - podcast-network
+      - otel-network
 
 networks:
   podcast-network:
     external: true
     name: podcast-network
+  otel-network:
+    external: true
+    name: ot_collector_otel
 
 volumes:
   media-tmp:

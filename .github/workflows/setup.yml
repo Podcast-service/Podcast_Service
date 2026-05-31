@@ -16,6 +16,12 @@ jobs:
             echo "/home/deploy/.env not found"
             exit 1
           fi
+      
+      - name: Start OTel stack
+        run: |
+          docker compose \
+            -f /home/deploy/otel-stack/docker-compose.yaml \
+            up -d
 
       - name: Start infrastructure
         run: |

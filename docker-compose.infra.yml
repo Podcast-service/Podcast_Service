@@ -135,15 +135,19 @@ services:
     restart: unless-stopped
     networks:
       - podcast-network
+      - otel-network
 
 volumes:
   auth-db-data:
   podcast-db-data:
   rabbitmq-data:
   kafka-data:
-  redis-data: 
+  redis-data:
 
 networks:
   podcast-network:
     driver: bridge
     name: podcast-network
+  otel-network:
+    external: true
+    name: ot_collector_otel
