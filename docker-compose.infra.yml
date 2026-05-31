@@ -8,8 +8,6 @@ services:
       POSTGRES_DB: ${AUTH_DB_NAME}
     expose:
       - "5432"
-    ports:
-      - "5433:5432"
     volumes:
       - auth-db-data:/var/lib/postgresql
     healthcheck:
@@ -131,6 +129,22 @@ services:
       kafka-topics --bootstrap-server kafka:9092 --list
       '
     restart: "no"
+    networks:
+      - podcast-network
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    expose:
+      - "8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: podcast-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      SERVER_SERVLET_CONTEXT_PATH: /kafka-ui
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
     networks:
       - podcast-network
 
