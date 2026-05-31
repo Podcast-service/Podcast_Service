@@ -87,6 +87,45 @@ services:
     restart: unless-stopped
     networks:
       - podcast-network
+    
+  tts_service_worker:
+    image: ghcr.io/podcast-service/tts_service:${TTS_SERVICE_TAG:-latest}
+    container_name: tts_worker
+    command: opentelemetry-instrument celery -A app.celery_app worker --loglevel=info -E --concurrency=1
+    env_file:
+      - /home/deploy/.env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_TOPIC_START: ${KAFKA_TOPIC_START}
+      KAFKA_TOPIC_MEDIA_UPLOADED: ${KAFKA_TOPIC_MEDIA_UPLOADED}
+      KAFKA_TOPIC_FAILED: ${KAFKA_TOPIC_FAILED}
+      AUDIO_DIR: /app/audio
+      CELERY_WORKER_PREFETCH_MULTIPLIER: 1
+      CELERY_WORKER_MAX_TASKS_PER_CHILD: 200
+      CELERY_WORKER_MAX_MEMORY_PER_CHILD: 900000
+      CELERY_RESULT_EXPIRES_SECONDS: 3600
+      S3_ENDPOINT_URL: ${S3_ENDPOINT_URL}
+      S3_REGION: ${S3_REGION}
+      S3_BUCKET: ${S3_BUCKET}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      S3_AUDIO_KEY_PREFIX: ${S3_AUDIO_KEY_PREFIX}
+      S3_PUBLIC_URL_BASE: ${S3_PUBLIC_URL_BASE}
+      OTEL_SERVICE_NAME: tts-worker
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED: "true"
+      OTEL_RESOURCE_ATTRIBUTES: service.namespace=tts,service.version=1.0.0,deployment.environment=${DEPLOYMENT_ENV}
+    volumes:
+      - tts-audio:/app/audio
+    restart: unless-stopped
+    networks:
+      - podcast-network
+      
 
   distribution_service:
     image: ghcr.io/podcast-service/distribution_service:${DISTRIBUTION_SERVICE_TAG:-latest}

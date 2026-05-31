@@ -49,6 +49,19 @@ jobs:
             -f docker-compose.yml \
             up -d --no-deps $SERVICE
 
+          # Если у сервиса есть worker — перезапускаем и его
+          WORKER_NAME="${SERVICE}_worker"
+          if docker compose \
+              --env-file /home/deploy/.env \
+              -f docker-compose.yml \
+              config --services | grep -q "^${WORKER_NAME}$"; then
+            echo "Found worker $WORKER_NAME, redeploying..."
+            docker compose \
+              --env-file /home/deploy/.env \
+              -f docker-compose.yml \
+              up -d --no-deps $WORKER_NAME
+          fi
+
           docker image prune -a -f
 
           echo "Successfully deployed $SERVICE:$IMAGE_TAG"
