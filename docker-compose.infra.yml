@@ -122,6 +122,7 @@ services:
       kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic media.subtitle.request --partitions 1 --replication-factor 1;
       kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic media.subtitle.ready --partitions 1 --replication-factor 1;
       kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic media.subtitle.error --partitions 1 --replication-factor 1;
+      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic tts.failed --partitions 1 --replication-factor 1;
       
       kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic podcast.user.register.DLT --partitions 1 --replication-factor 1;
       kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic media.DLT --partitions 1 --replication-factor 1;
