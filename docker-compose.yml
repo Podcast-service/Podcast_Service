@@ -47,6 +47,7 @@ services:
     env_file:
       - /home/deploy/.env
     environment:
+      PODCAST_API_BASE_URL: ${PODCAST_API_BASE_URL:-http://podcast-core:8083/podcast/v1}
       OTEL_SERVICE_NAME: media_worker
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
@@ -105,8 +106,11 @@ services:
       - "8083"
     restart: unless-stopped
     networks:
-      - podcast-network
-      - otel-network
+      podcast-network:
+        # Валидный по RFC alias без '_' для внутренних HTTP-вызовов к Tomcat.
+        aliases:
+          - podcast-core
+      otel-network: {}
 
   speech_service:
     image: ghcr.io/podcast-service/speech_service:${SPEECH_SERVICE_TAG:-latest}
