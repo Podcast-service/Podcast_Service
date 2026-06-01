@@ -61,10 +61,10 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
-    ports:
-      - "15672:15672"
+      RABBITMQ_MANAGEMENT_PATH_PREFIX: /rabbitmq
     expose:
       - "5672"
+      - "15672"
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     healthcheck:
@@ -193,7 +193,7 @@ volumes:
 
 networks:
   podcast-network:
-    driver: bridge
+    external: true
     name: podcast-network
   otel-network:
     external: true
