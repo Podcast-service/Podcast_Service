@@ -129,6 +129,12 @@ services:
       kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic media.subtitle.ready --partitions 1 --replication-factor 1;
       kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic media.subtitle.error --partitions 1 --replication-factor 1;
       kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic tts.failed --partitions 1 --replication-factor 1;
+      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic podcast.activity.events.v1 --partitions 1 --replication-factor 1;
+      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic podcast.content.events.v1 --partitions 1 --replication-factor 1;
+      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic podcast.search.events.v1 --partitions 1 --replication-factor 1;
+      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic podcast.activity.events.v1.DLT --partitions 1 --replication-factor 1;
+      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic podcast.content.events.v1.DLT --partitions 1 --replication-factor 1;
+      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic podcast.search.events.v1.DLT --partitions 1 --replication-factor 1;
       
       kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic podcast.user.register.DLT --partitions 1 --replication-factor 1;
       kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic media.DLT --partitions 1 --replication-factor 1;
