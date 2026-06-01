@@ -19,7 +19,7 @@ jobs:
       
       - name: Create networks
         run: |
-          docker network create --driver bridge --name podcast-network || true
+          docker network create --driver bridge podcast-network || true
       
       - name: Start OTel stack
         run: |
