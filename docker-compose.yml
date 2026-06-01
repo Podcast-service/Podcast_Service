@@ -47,7 +47,7 @@ services:
     env_file:
       - /home/deploy/.env
     environment:
-      PODCAST_API_BASE_URL: ${PODCAST_API_BASE_URL:-http://podcast-core:8083/podcast/v1}
+      PODCAST_API_BASE_URL: ${MEDIA_WORKER_PODCAST_API_BASE_URL:-http://podcast-core:8083/podcast/v1}
       OTEL_SERVICE_NAME: media_worker
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
