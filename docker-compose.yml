@@ -112,50 +112,6 @@ services:
           - podcast-core
       otel-network: {}
 
-  speech_service:
-    image: ghcr.io/podcast-service/speech_service:${SPEECH_SERVICE_TAG:-latest}
-    container_name: speech_service
-    env_file:
-      - /home/deploy/.env
-    environment:
-      KAFKA_BROKERS: ${KAFKA_BROKERS:-kafka:9092}
-      KAFKA_CONSUMER_RESTART_DELAY_SECONDS: ${KAFKA_CONSUMER_RESTART_DELAY_SECONDS:-5}
-      S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-https://s3.twcstorage.ru}
-      S3_BUCKET: ${S3_BUCKET:-4c5face5-544c-4bc2-a2e0-57a24d243af3}
-      SUBTITLE_BUCKET: ${SUBTITLE_BUCKET:-4c5face5-544c-4bc2-a2e0-57a24d243af3}
-      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:?set S3_ACCESS_KEY_ID}
-      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:?set S3_SECRET_ACCESS_KEY}
-      S3_REGION: ${S3_REGION:-ru-1}
-      S3_CREATE_BUCKET: ${S3_CREATE_BUCKET:-false}
-      SUBTITLE_MAX_RETRIES: ${SUBTITLE_MAX_RETRIES:-3}
-      SUBTITLE_MAX_CONCURRENT_JOBS: ${SUBTITLE_MAX_CONCURRENT_JOBS:-1}
-      TRANSCRIBER_BACKEND: whisper-rs
-      WHISPER_MODEL_PATH: ${WHISPER_MODEL_PATH:-/models/ggml-medium.bin}
-      WHISPER_THREADS: ${WHISPER_THREADS:-4}
-      WHISPER_GREEDY_BEST_OF: ${WHISPER_GREEDY_BEST_OF:-8}
-      PYANNOTE_ENABLED: ${PYANNOTE_ENABLED:-true}
-      PYANNOTE_DEVICE: ${PYANNOTE_DEVICE:-auto}
-      PYANNOTE_HF_TOKEN: ${PYANNOTE_HF_TOKEN:-}
-      PYANNOTE_CHUNK_SECONDS: ${PYANNOTE_CHUNK_SECONDS:-60}
-      PYANNOTE_CHUNK_OVERLAP_SECONDS: ${PYANNOTE_CHUNK_OVERLAP_SECONDS:-10}
-      PYANNOTE_NUM_SPEAKERS: ${PYANNOTE_NUM_SPEAKERS:-}
-      PYANNOTE_MIN_SPEAKERS: ${PYANNOTE_MIN_SPEAKERS:-}
-      PYANNOTE_MAX_SPEAKERS: ${PYANNOTE_MAX_SPEAKERS:-}
-      SPEAKER_CONTINUITY_MAX_GAP_MS: ${SPEAKER_CONTINUITY_MAX_GAP_MS:-1500}
-      OTEL_SERVICE_NAME: speech_service
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
-      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
-      OTEL_TRACES_EXPORTER: otlp
-      OTEL_METRICS_EXPORTER: otlp
-      OTEL_LOGS_EXPORTER: otlp
-      OTEL_RESOURCE_ATTRIBUTES: service.namespace=podcast,deployment.environment=${DEPLOYMENT_ENV}
-    volumes:
-      - ${WHISPER_MODELS_PATH:-/home/deploy/models}:/models:ro
-    restart: unless-stopped
-    networks:
-      - podcast-network
-      - otel-network
-
   podcast_client:
     image: ghcr.io/podcast-service/podcast_client:${PODCAST_CLIENT_TAG:-latest}
     container_name: podcast_client
@@ -176,45 +132,6 @@ services:
       OTEL_METRICS_EXPORTER: otlp
       OTEL_LOGS_EXPORTER: otlp
       OTEL_RESOURCE_ATTRIBUTES: service.namespace=podcast,deployment.environment=${DEPLOYMENT_ENV}
-    restart: unless-stopped
-    networks:
-      - podcast-network
-      - otel-network
-
-  tts_service_worker:
-    image: ghcr.io/podcast-service/tts_service:${TTS_SERVICE_TAG:-latest}
-    container_name: tts_worker
-    command: opentelemetry-instrument celery -A app.celery_app worker --loglevel=info -E --concurrency=1
-    env_file:
-      - /home/deploy/.env
-    environment:
-      REDIS_URL: redis://redis:6379/0
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      KAFKA_TOPIC_START: ${KAFKA_TOPIC_START}
-      KAFKA_TOPIC_MEDIA_UPLOAD: ${KAFKA_TOPIC_MEDIA_UPLOAD}
-      MEDIA_OBJECT_TYPE: ${MEDIA_OBJECT_TYPE}
-      AUDIO_DIR: /app/audio
-      CELERY_WORKER_PREFETCH_MULTIPLIER: 1
-      CELERY_WORKER_MAX_TASKS_PER_CHILD: 200
-      CELERY_WORKER_MAX_MEMORY_PER_CHILD: 900000
-      CELERY_RESULT_EXPIRES_SECONDS: 3600
-      S3_ENDPOINT_URL: ${S3_ENDPOINT_URL}
-      S3_REGION: ${S3_REGION}
-      S3_BUCKET: ${S3_BUCKET}
-      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
-      S3_SECRET_KEY: ${S3_SECRET_KEY}
-      S3_AUDIO_KEY_PREFIX: ${S3_AUDIO_KEY_PREFIX}
-      S3_PUBLIC_URL_BASE: ${S3_PUBLIC_URL_BASE}
-      OTEL_SERVICE_NAME: tts-worker
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
-      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
-      OTEL_TRACES_EXPORTER: otlp
-      OTEL_METRICS_EXPORTER: otlp
-      OTEL_LOGS_EXPORTER: otlp
-      OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED: "true"
-      OTEL_RESOURCE_ATTRIBUTES: service.namespace=tts,service.version=1.0.0,deployment.environment=${DEPLOYMENT_ENV}
-    volumes:
-      - tts-audio:/app/audio
     restart: unless-stopped
     networks:
       - podcast-network
