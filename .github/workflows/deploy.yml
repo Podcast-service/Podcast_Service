@@ -39,26 +39,33 @@ jobs:
 
           echo "Deploying $SERVICE:$IMAGE_TAG"
 
+          COMPOSE_FILES=(-f docker-compose.yml)
+          GPU_ENABLED=$(grep -E '^SPEECH_SERVICE_GPU_ENABLED=' /home/deploy/.env | tail -n 1 | cut -d= -f2- | tr -d '"[:space:]' | tr '[:upper:]' '[:lower:]' || true)
+          if [ "$SERVICE" = "speech_service" ] && { [ "$GPU_ENABLED" = "true" ] || [ "$GPU_ENABLED" = "1" ]; }; then
+            echo "Using NVIDIA GPU override for speech_service"
+            COMPOSE_FILES+=(-f docker-compose.gpu.yml)
+          fi
+
           docker compose \
             --env-file /home/deploy/.env \
-            -f docker-compose.yml \
+            "${COMPOSE_FILES[@]}" \
             pull $SERVICE
 
           docker compose \
             --env-file /home/deploy/.env \
-            -f docker-compose.yml \
+            "${COMPOSE_FILES[@]}" \
             up -d --no-deps $SERVICE
 
           # Если у сервиса есть worker — перезапускаем и его
           WORKER_NAME="${SERVICE}_worker"
           if docker compose \
               --env-file /home/deploy/.env \
-              -f docker-compose.yml \
+              "${COMPOSE_FILES[@]}" \
               config --services | grep -q "^${WORKER_NAME}$"; then
             echo "Found worker $WORKER_NAME, redeploying..."
             docker compose \
               --env-file /home/deploy/.env \
-              -f docker-compose.yml \
+              "${COMPOSE_FILES[@]}" \
               up -d --no-deps $WORKER_NAME
           fi
 

@@ -1,0 +1,14 @@
+services:
+  speech_service:
+    image: ghcr.io/podcast-service/speech_service:${SPEECH_SERVICE_TAG:-latest}-cuda
+    environment:
+      NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}
+      NVIDIA_DRIVER_CAPABILITIES: ${NVIDIA_DRIVER_CAPABILITIES:-compute,utility}
+      PYANNOTE_DEVICE: ${PYANNOTE_DEVICE:-auto}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
