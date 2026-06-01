@@ -174,7 +174,7 @@ volumes:
 
 networks:
   podcast-network:
-    driver: bridge
+    external: true
     name: podcast-network
   otel-network:
     external: true
