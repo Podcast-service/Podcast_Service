@@ -64,6 +64,28 @@ services:
       - podcast-network
       - otel-network
 
+  tts_service:
+    image: ghcr.io/podcast-service/tts_service:${TTS_SERVICE_TAG:-latest}
+    container_name: tts_service
+    env_file:
+      - /home/deploy/.env
+    environment:
+      OTEL_SERVICE_NAME: tts_service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_RESOURCE_ATTRIBUTES: service.namespace=tts,deployment.environment=${DEPLOYMENT_ENV}
+    expose:
+      - "8000"
+    volumes:
+      - tts-audio:/app/audio
+    restart: unless-stopped
+    networks:
+      - podcast-network
+      - otel-network
+
   podcast_core:
     image: ghcr.io/podcast-service/podcast_core:${PODCAST_CORE_TAG:-latest}
     container_name: podcast_core
