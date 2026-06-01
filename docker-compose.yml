@@ -133,6 +133,31 @@ services:
     networks:
       - podcast-network
 
+  recommendation_service:
+    image: ghcr.io/podcast-service/recommendation_service:${RECOMMENDATION_SERVICE_TAG:-latest}
+    container_name: recommendation_service
+    env_file:
+      - /home/deploy/.env
+    environment:
+      SERVER_PORT: 8085
+      RECOMMENDATION_DB_URL: jdbc:postgresql://recommendation-db:5432/${RECOMMENDATION_DB_NAME}
+      RECOMMENDATION_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      RECOMMENDATION_JWT_SECRET: ${RECOMMENDATION_JWT_SECRET}
+      RECOMMENDATION_CORS_ALLOWED_ORIGINS: ${RECOMMENDATION_CORS_ALLOWED_ORIGINS}
+      OTEL_SERVICE_NAME: recommendation_service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_RESOURCE_ATTRIBUTES: service.namespace=podcast,deployment.environment=${DEPLOYMENT_ENV}
+    expose:
+      - "8085"
+    restart: unless-stopped
+    networks:
+      - podcast-network
+      - otel-network
+
   email_service:
     image: ghcr.io/podcast-service/email_service:${EMAIL_SERVICE_TAG:-latest}
     container_name: email_service

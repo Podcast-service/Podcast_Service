@@ -39,6 +39,26 @@ services:
     networks:
       - podcast-network
 
+  recommendation-db:
+    image: postgres:18-alpine
+    container_name: recommendation-db
+    environment:
+      POSTGRES_USER: ${RECOMMENDATION_DB_USER}
+      POSTGRES_PASSWORD: ${RECOMMENDATION_DB_PASSWORD}
+      POSTGRES_DB: ${RECOMMENDATION_DB_NAME}
+    expose:
+      - "5432"
+    volumes:
+      - recommendation-db-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${RECOMMENDATION_DB_USER} -d ${RECOMMENDATION_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - podcast-network
+
   redis:
     image: redis:7-alpine
     container_name: redis
@@ -247,6 +267,7 @@ volumes:
   sonar-logs:
   sonar-extensions:
   sonar-db-data:
+  recommendation-db-data:
 
 networks:
   podcast-network:
