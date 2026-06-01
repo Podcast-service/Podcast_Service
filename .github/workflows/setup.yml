@@ -17,6 +17,10 @@ jobs:
             exit 1
           fi
       
+      - name: Create networks
+        run: |
+          docker network create --driver bridge --name podcast-network || true
+      
       - name: Start OTel stack
         run: |
           docker compose \
