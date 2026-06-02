@@ -176,10 +176,8 @@ services:
       - "8085"
     restart: unless-stopped
     networks:
-      podcast-network:
-        aliases:
-          - recommendation-core
-      otel-network: {}
+      - podcast-network
+      - otel-network
 
   email_service:
     image: ghcr.io/podcast-service/email_service:${EMAIL_SERVICE_TAG:-latest}
